@@ -19,6 +19,9 @@ pub enum Error {
 	IO(#[from] std::io::Error),
 
 	#[error(transparent)]
+	SysTime(#[from] std::time::SystemTimeError),
+
+	#[error(transparent)]
 	Reqwest(#[from] reqwest::Error),
 
 }
