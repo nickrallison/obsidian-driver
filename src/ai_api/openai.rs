@@ -66,6 +66,37 @@ impl OpenAIDriver {
 		let response_text = response.text().await?;
 		Ok(response_text)
 	}
+
+	pub async fn chat_cheap(&self, prompt: Prompt) -> Result<String> {
+		let tokens = prompt.max_characters / self.config.characters_per_token;
+		if tokens > self.config.cheap_model_max_tokens {
+			return Err(Error::PromptExceedsModelTokenLimit(prompt));
+		}
+		let request_body = serde_json::json!({
+			"model": &self.config.cheap_text_model,
+			"messages": vec![
+				ChatMessage {
+					role: "system".to_string(),
+					content: prompt.system_prompt,
+				},
+				ChatMessage {
+					role: "user".to_string(),
+					content: prompt.user_prompt,
+				},
+			],
+			"max_tokens": tokens,
+		});
+
+		let response = self.client.post(&self.config.chat_url)
+			.header("Content-Type", "application/json")
+			.header("Authorization", format!("Bearer {}", self.config.api_key))
+			.json(&request_body)
+			.send()
+			.await?;
+
+		let response_text = response.text().await?;
+		Ok(response_text)
+	}
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

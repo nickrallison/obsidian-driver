@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 use openai::{OpenAIDriver, OpenAIConfig};
 
 pub mod openai;
-pub(crate) mod prompt;
+pub mod prompt;
+
+use crate::prelude::*;
 
 #[derive(Clone, Debug)]
 pub enum AIDriver {
@@ -17,5 +19,17 @@ impl AIDriver {
 	pub fn new_openai_from_config_path(config_path: PathBuf) -> AIDriver {
 		let config = OpenAIConfig::from_file(config_path);
 		AIDriver::OpenAI(OpenAIDriver::new(config))
+	}
+
+	pub async fn chat_smart(&self, prompt: prompt::Prompt) -> Result<String> {
+		match self {
+			AIDriver::OpenAI(driver) => driver.chat_smart(prompt).await,
+		}
+	}
+
+	pub async fn chat_cheap(&self, prompt: prompt::Prompt) -> Result<String> {
+		match self {
+			AIDriver::OpenAI(driver) => driver.chat_cheap(prompt).await,
+		}
 	}
 }
