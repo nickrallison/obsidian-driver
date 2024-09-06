@@ -1,11 +1,12 @@
+
+mod vault;
+mod mdfile;
+
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::prelude::*;
 
-use mdfile::MDFile;
-
-mod mdfile;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct File {
@@ -17,7 +18,7 @@ pub struct File {
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum FileContents {
-	MDFile(MDFile),
+	MDFile(mdfile::MDFile),
 // 	Other(OtherFile)
 }
 
@@ -25,7 +26,7 @@ impl File {
 	fn new_raw(path: PathBuf, ext: &str, contents: String, last_modified: Option<u128>) -> Result<Self> {
 		match ext {
 			"md" => {
-				let mdfile_contents = MDFile::from_string(contents);
+				let mdfile_contents = mdfile::MDFile::from_string(contents);
 				Ok(Self {
 					path,
 					contents: FileContents::MDFile(mdfile_contents),
@@ -42,47 +43,6 @@ impl File {
 		let contents = std::fs::read_to_string(&path)?;
 		Self::new_raw(path, ext, contents, Some(last_modified))
 	}
-
-	// pub fn save(self) -> Result<Self> {
-	// 	let mut owned = self;
-	// 	let file_saved: u128 = std::fs::metadata(&owned.path)?.modified()?.elapsed()?.as_millis();
-	// 	let prev_last_modified: u128 = owned.last_modified.unwrap_or(0);
-	// 	if file_saved == prev_last_modified {
-	// 		return Ok(owned);
-	// 	}
-	// 	match owned.contents {
-	// 		FileContents::MDFile(f) => {
-	// 			let contents = std::fs::read_to_string(&owned.path)?;
-	// 			let f = f.update(contents)?;
-	// 			let f = f.save(&owned.path)?;
-	// 			owned.contents = FileContents::MDFile(f);
-	// 			owned.last_modified = Some(std::fs::metadata(&owned.path)?.modified()?.elapsed()?.as_millis());
-	// 			return Ok(owned);
-	// 		}
-	// 	}
-	// }
-
-	// pub fn update(self) -> Result<Self> {
-	// 	let file_updated: u128 = std::fs::metadata(&self.path)?.modified()?.elapsed()?.as_millis();
-	// 	if self.last_modified.is_some() {
-	// 		if file_updated == self.last_modified.expect("last_modified is None") {
-	// 			return Ok(self);
-	// 		}
-	// 	}
-	// 	let contents = std::fs::read_to_string(&self.path)?;
-	// 	match self.contents {
-	// 		FileContents::MDFile(f) => {
-	// 			let f = f.update(contents)?;
-	// 			return Ok(File {
-	// 				path: self.path,
-	// 				contents: FileContents::MDFile(f),
-	// 				last_modified: Some(file_updated)
-	// 			})
-	// 		}
-	// 	}
-
-
-	// }
 }
 
 #[cfg(test)]
@@ -100,7 +60,7 @@ mod file_tests {
 		let expected = File {
 			path: PathBuf::from("test.md"),
 			last_modified: None,
-			contents: FileContents::MDFile(MDFile::from_string(contents))
+			contents: FileContents::MDFile(mdfile::MDFile::from_string(contents))
 		};
 		assert_eq!(actual, expected);
 	}

@@ -1,8 +1,7 @@
 use std::path::PathBuf;
 use openai::{OpenAIDriver, OpenAIConfig};
 
-pub mod openai;
-pub mod prompt;
+mod openai;
 
 use crate::prelude::*;
 
@@ -20,13 +19,13 @@ impl AIDriver {
 		AIDriver::OpenAI(OpenAIDriver::new(config))
 	}
 
-	pub async fn chat_smart(&self, prompt: prompt::Prompt) -> Result<String> {
+	pub async fn chat_smart(&self, prompt: super::prompt::Prompt) -> Result<String> {
 		match self {
 			AIDriver::OpenAI(driver) => driver.chat_smart(prompt).await,
 		}
 	}
 
-	pub async fn chat_cheap(&self, prompt: prompt::Prompt) -> Result<String> {
+	pub async fn chat_cheap(&self, prompt: super::prompt::Prompt) -> Result<String> {
 		match self {
 			AIDriver::OpenAI(driver) => driver.chat_cheap(prompt).await,
 		}

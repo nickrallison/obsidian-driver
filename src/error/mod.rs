@@ -1,7 +1,5 @@
 //! Main Crate Error
 
-use crate::ai_api::prompt::Prompt;
-
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
 	#[error("Generic Error:\n{0}")]
@@ -12,7 +10,7 @@ pub enum Error {
 	// InvalidConfigFile(String),
 
 	#[error("Prompt Exceeds Model Token Limit:\n{0}")]
-	PromptExceedsModelTokenLimit(Prompt),
+	PromptExceedsModelTokenLimit(crate::ai::prompt::Prompt),
 
 	// Transparent Errors
 	#[error(transparent)]

@@ -1,5 +1,5 @@
-mod ai_api;
-mod obsidian_file_io;
+pub mod ai;
+pub mod file;
 mod prelude;
 mod error;
 

@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
-use crate::ai_api::prompt::Prompt;
 use reqwest::Client;
 
 use crate::prelude::*;
@@ -36,7 +35,7 @@ impl OpenAIDriver {
 		let response_text = response.text().await?;
 		Ok(response_text)
 	}
-	pub async fn chat_smart(&self, prompt: Prompt) -> Result<String> {
+	pub async fn chat_smart(&self, prompt: crate::ai::prompt::Prompt) -> Result<String> {
 		let tokens = prompt.max_characters / self.config.characters_per_token;
 		if tokens > self.config.smart_model_max_tokens {
 			return Err(Error::PromptExceedsModelTokenLimit(prompt));
@@ -67,7 +66,7 @@ impl OpenAIDriver {
 		Ok(response_text)
 	}
 
-	pub async fn chat_cheap(&self, prompt: Prompt) -> Result<String> {
+	pub async fn chat_cheap(&self, prompt: crate::ai::prompt::Prompt) -> Result<String> {
 		let tokens = prompt.max_characters / self.config.characters_per_token;
 		if tokens > self.config.cheap_model_max_tokens {
 			return Err(Error::PromptExceedsModelTokenLimit(prompt));
