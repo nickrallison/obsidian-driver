@@ -88,8 +88,6 @@ impl File {
 #[cfg(test)]
 mod file_tests {
 
-	use serde_json::error;
-
 	use super::*;
 
 	#[test]

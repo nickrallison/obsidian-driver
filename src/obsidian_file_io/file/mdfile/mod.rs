@@ -39,35 +39,6 @@ impl MDFile {
         }
     }
 
-	// pub(crate) fn save(self, path: &Path) -> Result<Self> {
-	// 	let mut owned = self;
-	// 	owned.save_mut(path)?;
-	// 	Ok(owned)
-	// }
-
-	// pub(crate) fn save_mut(&mut self, path: &Path) -> Result<()> {
-	// 	std::fs::write(path, &self.contents)?;
-	// 	Ok(())
-	// }
-
-
-	// pub(crate) fn update(self, contents: String) -> Result<Self> {
-	// 	let mut owned = self;
-	// 	owned.update_mut(contents)?;
-	// 	Ok(owned)
-	// }
-
-	// pub(crate) fn update_mut(&mut self, contents: String) -> Result<()> {
-
-
-	// 	let contents_updated: bool = contents != self.contents;
-	// 	self.contents = contents;
-	// 	if contents_updated {
-	// 		self.embedding = None;
-	// 	}
-	// 	Ok(())
-	// }
-
 
 }
 
@@ -110,13 +81,4 @@ This is a test file."#);
             assert_eq!(actual, expected);
         }
     
-        // #[test]
-        // fn test_save() {
-        // 	let path = PathBuf::from("test.md");
-        // 	let last_modified: Option<u128> = None;
-        // 	let contents: String = "# Test\n\nThis is a test file.".to_string();
-        // 	let ext: &str = "md";
-        // 	let file = File::new_raw(path, ext, contents.clone(), last_modified).unwrap();
-        // 	let actual = file.save().unwrap();
-        // 	let expected = File {
 }
