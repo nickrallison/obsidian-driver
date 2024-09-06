@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use serde::{Deserialize, Serialize};
 use openai::{OpenAIDriver, OpenAIConfig};
 
 pub mod openai;

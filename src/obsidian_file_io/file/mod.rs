@@ -26,13 +26,13 @@ impl File {
 		match ext {
 			"md" => {
 				let mdfile_contents = MDFile::from_string(contents);
-				return Ok(Self {
+				Ok(Self {
 					path,
 					contents: FileContents::MDFile(mdfile_contents),
-					last_modified: last_modified
+					last_modified
 				})
 			},
-			_ => Err(Error::Generic(f!("Unsupported extension found for file: {}", path.display())).into())
+			_ => Err(Error::Generic(f!("Unsupported extension found for file: {}", path.display())))
 		}
 	}
 	pub fn read(path: PathBuf) -> Result<Self> {

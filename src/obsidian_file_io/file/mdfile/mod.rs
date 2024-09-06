@@ -1,4 +1,3 @@
-use std::path::{PathBuf, Path};
 use serde::{Deserialize, Serialize};
 use regex::Regex;
 
@@ -72,12 +71,12 @@ mod mdfile_tests {
                 embedding: None,
             };
             let actual = mdfile.to_string();
-            let expected = format!(r#"---
+            let expected = r#"---
 key: value
 ---
 # Test
 
-This is a test file."#);
+This is a test file."#.to_string();
             assert_eq!(actual, expected);
         }
     

@@ -130,7 +130,7 @@ impl OpenAIConfig {
 	//   -H "Authorization: Bearer $OPENAI_API_KEY" \
 	pub async fn validate(&self) -> Result<()> {
 		let validator = OpenAIValidator::new(self.clone());
-		return validator.validate().await;
+		validator.validate().await
 	}
 
 	pub(crate) fn from_file(config_path: PathBuf) -> OpenAIConfig {

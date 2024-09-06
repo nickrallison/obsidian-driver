@@ -1,6 +1,5 @@
 use std::fmt::Display;
 use serde::{Serialize, Deserialize};
-use serde_json;
 
 // pub trait Prompt {
 // 	fn get_system_prompt(&self) -> String;
@@ -19,7 +18,7 @@ impl Prompt {
 		Prompt {
 			system_prompt: system_prompt.to_string(),
 			user_prompt: user_prompt.to_string(),
-			max_characters: max_characters,
+			max_characters,
 		}
 	}
 }
