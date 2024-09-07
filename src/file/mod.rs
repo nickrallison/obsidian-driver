@@ -1,5 +1,4 @@
 
-mod vault;
 mod mdfile;
 
 use std::path::PathBuf;
@@ -42,6 +41,15 @@ impl File {
 		let last_modified = std::fs::metadata(&path)?.modified()?.elapsed()?.as_millis();
 		let contents = std::fs::read_to_string(&path)?;
 		Self::new_raw(path, ext, contents, Some(last_modified))
+	}
+	pub fn write(&self) -> Result<()> {
+		match &self.contents {
+			FileContents::MDFile(mdfile) => {
+				let contents = mdfile.to_string();
+				std::fs::write(&self.path, contents)?;
+				Ok(())
+			},
+		}
 	}
 }
 

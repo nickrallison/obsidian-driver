@@ -32,8 +32,15 @@ impl MDFile {
             self.body.clone()
         }
     }
-
-
+    pub(crate) fn create_embedding(&self) -> Vec<f32> {
+        todo!()
+    }
+    pub(crate) fn update_embedding(&mut self) {
+        todo!()
+    }
+    pub(crate) fn get_embedding(&self) -> Vec<f32> {
+        todo!()
+    }
 }
 
 #[cfg(test)]
