@@ -16,7 +16,7 @@ pub struct File {
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub enum FileContents {
+pub(crate) enum FileContents {
 	MDFile(mdfile::MDFile),
 // 	Other(OtherFile)
 }
@@ -35,13 +35,32 @@ impl File {
 			_ => Err(Error::Generic(f!("Unsupported extension found for file: {}", path.display())))
 		}
 	}
-	pub fn read(path: PathBuf) -> Result<Self> {
+	fn read_file(path: PathBuf) -> Result<Self> {
 		let path_clone = path.clone();
 		let ext = path_clone.extension().ok_or(Error::Generic(f!("No extension found for file: {}", path.display())))?.to_str().ok_or(Error::Generic(f!("Invalid extension for file: {}", path.display())))?;
 		let last_modified = std::fs::metadata(&path)?.modified()?.elapsed()?.as_millis();
 		let contents = std::fs::read_to_string(&path)?;
 		Self::new_raw(path, ext, contents, Some(last_modified))
 	}
+	fn read_cached(path: PathBuf) -> Result<Self> {
+		// Err(Error::Generic("Not implemented".to_string()))
+		todo!()
+	}
+	pub fn read(path: PathBuf) -> Result<Self> {
+		let cached = Self::read_cached(path.clone());
+		let file_last_modified = std::fs::metadata(&path)?.modified()?.elapsed()?.as_millis();
+		match cached {
+			Ok(file) => {
+				if file.last_modified.unwrap() < file_last_modified {
+					Self::read_file(path)
+				} else {
+					Ok(file)
+				}
+			},
+			Err(_) => Self::read_file(path)
+		}
+	}
+
 	pub fn write(&self) -> Result<()> {
 		match &self.contents {
 			FileContents::MDFile(mdfile) => {
