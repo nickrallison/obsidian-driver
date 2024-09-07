@@ -55,6 +55,12 @@ pub struct Context {
 	context: HashMap<String, String>,
 }
 
+impl Default for Context {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Context {
 	pub fn new() -> Context {
 		Context {
