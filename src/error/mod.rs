@@ -5,6 +5,9 @@ pub enum Error {
 	#[error("Generic Error:\n{0}")]
 	Generic(String),
 
+	#[error("Invalid Context Key:\n{0}")]
+	InvalidContextKey(String),
+
 	// Specific Errors for application
 	// #[error("Invalid Config File:\n{0}")]
 	// InvalidConfigFile(String),

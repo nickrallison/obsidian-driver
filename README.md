@@ -8,6 +8,9 @@ This is a rust driver for Obsidian. It is meant to provide reusable interfaces f
    3. Appending to the current File
 3. Using Embeddings
 
+Planned optimizations include:
+1. File Caching on load
+
 Some more advanced functionality is also planned but not implemented as of now like:
 1. Finding Similar Notes with embeddings
 2. Merging Similar Notes found via embeddings
