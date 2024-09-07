@@ -1,5 +1,5 @@
 
-mod mdfile;
+pub mod mdfile;
 
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
