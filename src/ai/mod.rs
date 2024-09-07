@@ -4,7 +4,7 @@ use crate::file::mdfile::MDFile;
 
 pub use crate::prelude::*;
 
-mod api;
+pub mod api;
 pub mod prompt;
 
 pub fn generate_file(driver: &AIDriver, prompt: Prompt, context: String, title: String) -> crate::file::File {
