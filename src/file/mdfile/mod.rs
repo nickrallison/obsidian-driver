@@ -12,7 +12,7 @@ pub struct MDFile {
 
 impl MDFile {
 	// Constructor
-	fn new_raw(yaml: Option<serde_yaml::Value>, body: String) -> Self {
+	pub fn new(yaml: Option<serde_yaml::Value>, body: String) -> Self {
 		Self {
 			yaml,
 			body,
@@ -68,7 +68,7 @@ impl MDFile {
 		let captures = yaml_pattern.captures(&contents).unwrap();
 		let yaml = captures.name("yaml").map(|m| serde_yaml::from_str(m.as_str()).unwrap());
 		let body = captures.name("body").unwrap().as_str().to_string();
-		Self::new_raw(yaml, body)
+		Self::new(yaml, body)
 	}
 	pub fn to_string(&self) -> String {
 		if let Some(yaml) = &self.yaml {
@@ -99,7 +99,7 @@ mod mdfile_tests {
 	// Setter / Getter Tests
 	#[test]
 	fn test_get_set_yaml() {
-		let mut mdfile = MDFile::new_raw(None, "# Test\n\nThis is a test file.".to_string());
+		let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
 		let mut yaml = serde_yaml::Value::Mapping(serde_yaml::Mapping::new());
 		yaml.as_mapping_mut().unwrap().insert(serde_yaml::Value::String("key".to_string()), serde_yaml::Value::String("value".to_string()));
 		mdfile.set_yaml(yaml.clone());
@@ -110,7 +110,7 @@ mod mdfile_tests {
 	}
 	#[test]
 	fn test_add_yaml_key() {
-		let mut mdfile = MDFile::new_raw(None, "# Test\n\nThis is a test file.".to_string());
+		let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
 		mdfile.add_yaml_key("key".to_string(), serde_yaml::Value::String("value".to_string()));
 
 		let binding = serde_yaml::Value::String("value".to_string());
@@ -120,7 +120,7 @@ mod mdfile_tests {
 	}
 	#[test]
 	fn test_get_yaml_key() {
-		let mut mdfile = MDFile::new_raw(None, "# Test\n\nThis is a test file.".to_string());
+		let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
 		let mut yaml = serde_yaml::Value::Mapping(serde_yaml::Mapping::new());
 		yaml.as_mapping_mut().unwrap().insert(serde_yaml::Value::String("key".to_string()), serde_yaml::Value::String("value".to_string()));
 		mdfile.set_yaml(yaml);
@@ -132,7 +132,7 @@ mod mdfile_tests {
 	}
 	#[test]
 	fn test_get_set_body() {
-		let mut mdfile = MDFile::new_raw(None, "# Test\n\nThis is a test file.".to_string());
+		let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
 		mdfile.set_body("# New Test\n\nThis is a new test file.".to_string());
 
 		let expected = "# New Test\n\nThis is a new test file.".to_string();
