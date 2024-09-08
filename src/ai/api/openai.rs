@@ -145,10 +145,10 @@ impl OpenAIConfig {
         validator.validate().await
     }
 
-    pub(crate) fn from_file(config_path: PathBuf) -> OpenAIConfig {
-        let config_file = std::fs::File::open(config_path).unwrap();
-        let config: OpenAIConfig = serde_json::from_reader(config_file).unwrap();
-        config
+    pub(crate) fn from_file(config_path: PathBuf) -> Result<OpenAIConfig> {
+        let config_file = std::fs::File::open(config_path)?;
+        let config: OpenAIConfig = serde_json::from_reader(config_file)?;
+        Ok(config)
     }
 }
 

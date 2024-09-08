@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use futures::{executor, future};
+use futures::future;
 
 use crate::ai::api::AIDriver;
 use crate::ai::prompt::{Context, Prompt};

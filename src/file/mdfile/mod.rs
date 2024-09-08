@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -8,15 +9,17 @@ pub struct MDFile {
     yaml: Option<serde_yaml::Value>,
     body: String,
     embedding: Option<Vec<f64>>,
+    path: Option<PathBuf>
 }
 
 impl MDFile {
     // Constructor
-    pub fn new(yaml: Option<serde_yaml::Value>, body: String) -> Self {
+    pub fn new(yaml: Option<serde_yaml::Value>, body: String, path: Option<PathBuf>) -> Self {
         Self {
             yaml,
             body,
             embedding: None,
+            path
         }
     }
 
@@ -62,6 +65,13 @@ impl MDFile {
         &self.body
     }
 
+    pub fn set_path(&mut self, path: Option<PathBuf>) {
+        self.path = path;
+    }
+    pub fn get_path(&self) -> Option<&PathBuf> {
+        self.path.as_ref()
+    }
+
     // Serialization Methods
     pub fn from_string(contents: String) -> Self {
         let yaml_pattern =
@@ -71,7 +81,7 @@ impl MDFile {
             .name("yaml")
             .map(|m| serde_yaml::from_str(m.as_str()).unwrap());
         let body = captures.name("body").unwrap().as_str().to_string();
-        Self::new(yaml, body)
+        Self::new(yaml, body, None)
     }
     pub fn to_string(&self) -> String {
         if let Some(yaml) = &self.yaml {
@@ -83,9 +93,22 @@ impl MDFile {
     }
 
     // Embedding Methods
-    pub async fn update_embedding(&mut self, driver: &crate::ai::api::AIDriver) -> Result<()> {
-        self.embedding = Some(driver.get_embedding(&self.to_string()).await?);
-        Ok(())
+    pub async fn update_embedding(&mut self, driver: &crate::ai::api::AIDriver) -> (&PathBuf, Result<()>) {
+        println!("Updating embedding started for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
+        if self.embedding.is_some() {
+            println!("Embedding already exists for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
+            return (&self.path.as_ref().unwrap(), Ok(()));
+        }
+        let embedding = driver.get_embedding(&self.to_string()).await;
+        if let Ok(embedding) = embedding {
+            self.embedding = Some(embedding);
+        } else {
+            let error = embedding.err().unwrap();
+            return (&self.path.as_ref().unwrap(), Err(error));
+        }
+        
+        println!("Updating embedding finished for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
+        (&self.path.as_ref().unwrap(), Ok(()))  
     }
     pub fn get_embedding(&self) -> Option<&Vec<f64>> {
         self.embedding.as_ref()
@@ -100,7 +123,7 @@ mod mdfile_tests {
     // Setter / Getter Tests
     #[test]
     fn test_get_set_yaml() {
-        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
+        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string(), None);
         let mut yaml = serde_yaml::Value::Mapping(serde_yaml::Mapping::new());
         yaml.as_mapping_mut().unwrap().insert(
             serde_yaml::Value::String("key".to_string()),
@@ -114,7 +137,7 @@ mod mdfile_tests {
     }
     #[test]
     fn test_add_yaml_key() {
-        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
+        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string(), None);
         mdfile.add_yaml_key(
             "key".to_string(),
             serde_yaml::Value::String("value".to_string()),
@@ -127,7 +150,7 @@ mod mdfile_tests {
     }
     #[test]
     fn test_get_yaml_key() {
-        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
+        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string(), None);
         let mut yaml = serde_yaml::Value::Mapping(serde_yaml::Mapping::new());
         yaml.as_mapping_mut().unwrap().insert(
             serde_yaml::Value::String("key".to_string()),
@@ -142,7 +165,7 @@ mod mdfile_tests {
     }
     #[test]
     fn test_get_set_body() {
-        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string());
+        let mut mdfile = MDFile::new(None, "# Test\n\nThis is a test file.".to_string(), None);
         mdfile.set_body("# New Test\n\nThis is a new test file.".to_string());
 
         let expected = "# New Test\n\nThis is a new test file.".to_string();
@@ -165,6 +188,7 @@ mod mdfile_tests {
             yaml: Some(serde_yaml::Value::Mapping(yaml_expected)),
             body: "# Test\n\nThis is a test file.".to_string(),
             embedding: None,
+            path: None
         };
         assert_eq!(actual, expected);
     }
@@ -180,6 +204,7 @@ mod mdfile_tests {
             yaml: Some(serde_yaml::Value::Mapping(yaml_expected)),
             body: "# Test\n\nThis is a test file.".to_string(),
             embedding: None,
+            path: None
         };
         let actual = mdfile.to_string();
         let expected = r#"---
@@ -201,6 +226,7 @@ This is a test file."#
             yaml: None,
             body: "# Test\n\nThis is a test file.".to_string(),
             embedding: None,
+            path: None
         };
         assert_eq!(actual, expected);
     }
@@ -211,6 +237,7 @@ This is a test file."#
             yaml: None,
             body: "# Test\n\nThis is a test file.".to_string(),
             embedding: None,
+            path: None
         };
         let actual = mdfile.to_string();
         let expected = r#"# Test

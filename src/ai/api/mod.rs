@@ -14,9 +14,9 @@ impl AIDriver {
     pub fn new_openai(config: OpenAIConfig) -> AIDriver {
         AIDriver::OpenAI(OpenAIDriver::new(config))
     }
-    pub fn new_openai_from_config_path(config_path: PathBuf) -> AIDriver {
-        let config = OpenAIConfig::from_file(config_path);
-        AIDriver::OpenAI(OpenAIDriver::new(config))
+    pub fn new_openai_from_config_path(config_path: PathBuf) -> Result<AIDriver> {
+        let config = OpenAIConfig::from_file(config_path)?;
+        Ok(AIDriver::OpenAI(OpenAIDriver::new(config)))
     }
 
     pub async fn chat_smart(&self, prompt: super::prompt::Prompt) -> Result<String> {

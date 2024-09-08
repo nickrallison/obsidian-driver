@@ -1,5 +1,7 @@
 //! Main Crate Error
 
+use std::path::PathBuf;
+
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("Generic Error:\n{0}")]
@@ -11,11 +13,17 @@ pub enum Error {
     #[error("Invalid Embedding Response:\n{0}")]
     InvalidEmbeddingResponse(String),
 
-    // Specific Errors for application
-    // #[error("Invalid Config File:\n{0}")]
-    // InvalidConfigFile(String),
     #[error("Prompt Exceeds Model Token Limit:\n{0}")]
     PromptExceedsModelTokenLimit(crate::ai::prompt::Prompt),
+
+    #[error("Vault Already Contains Path:\n{0}")]
+    VaultAlreadyContainsPath(PathBuf),
+
+    #[error("Path: {0}\nNot In Vault Root:\n{0}")]
+    PathNotInVaultRoot(PathBuf, PathBuf),
+
+    #[error("No AI Driver Provided")]
+    NoAIDriver,
 
     // Transparent Errors
     #[error(transparent)]
@@ -29,4 +37,8 @@ pub enum Error {
 
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),
+    
+    #[error(transparent)]
+    StripPrefixError(#[from] std::path::StripPrefixError),
+    
 }
