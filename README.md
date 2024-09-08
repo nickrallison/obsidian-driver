@@ -1,29 +1,33 @@
 # Obsidian Driver
 
 **This is a rust driver for Obsidian. It is meant to provide reusable interfaces for common functionality like:**
-1. Reading and Writing files / directories
-2. Calls to the OpenAI API
-   1. Creating New Files
-   2. Modifying the current File
-   3. Appending to the current File
-3. Using Embeddings
+- [ ] Reading and Writing files / directories
+	- [x] Writing Files
+    - [x] Reading Files
+    - [ ] Making Directories
+    - [ ] Reading Directories
+- [ ] Calls to the OpenAI API
+	- [ ] Creating New Files
+	- [ ] Modifying the current File
+	- [ ] Appending to the current File
+- [ ] Using Embeddings
 
 **Planned optimizations include:**
-1. File Caching on load
+- [ ] File Caching on load
 
 **Some more advanced functionality is also planned but not implemented as of now like:**
-1. Finding Similar Notes with embeddings
-2. Merging Similar Notes found via embeddings
-3. Prompt structs for OpenAI API customization
-4. Transcribing different information formats like the following into markdown:
-   1. Files
-      1. Text Files (duh)
-      2. PDFs
-      3. MP3s / Other Audio
-      4. MKVs / Other Video
-   2. Weblinks
-      1. Youtube
-      2. Other Text Links
-5. Mapping existing links between files
-   1. Finding links with embeddings that don't match to show possible bad links 
-6. Recommend Tags Based on existing tags / need new tag
+- [ ] Finding Similar Notes with embeddings
+- [ ] Merging Similar Notes found via embeddings 
+- [ ] Prompt structs for OpenAI API customization 
+- [ ] Transcribing different information formats like the following into markdown:
+	- [ ] Files
+		- [ ] Text Files (duh)
+		- [ ] PDFs
+		- [ ] MP3s / Other Audio
+		- [ ] MKVs / Other Video
+	- [ ] Weblinks
+		- [ ] Youtube
+		- [ ] Other Text Links
+- [ ] Mapping existing links between files
+	- [ ] Finding links with embeddings that don't match to show possible bad links
+- [ ] Recommend Tags Based on existing tags / need new tag

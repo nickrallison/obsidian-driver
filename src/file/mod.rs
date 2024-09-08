@@ -97,6 +97,14 @@ impl File {
 			FileContents::MDFile(mdfile) => Some(mdfile),
 		}
 	}
+
+    pub fn from_mdfile(path: PathBuf, mdfile: mdfile::MDFile) -> Self {
+        Self {
+            path,
+            last_modified: None,
+            contents: FileContents::MDFile(mdfile),
+        }
+    }
 }
 
 #[cfg(test)]
