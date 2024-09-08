@@ -24,3 +24,5 @@ Some more advanced functionality is also planned but not implemented as of now l
    2. Weblinks
       1. Youtube
       2. Other Text Links
+5. Mapping existing links between files
+   1. Finding links with embeddings that don't match to show possible bad links     
