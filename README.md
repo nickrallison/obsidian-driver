@@ -1,6 +1,6 @@
 # Obsidian Driver
 
-This is a rust driver for Obsidian. It is meant to provide reusable interfaces for common functionality like:
+**This is a rust driver for Obsidian. It is meant to provide reusable interfaces for common functionality like:**
 1. Reading and Writing files / directories
 2. Calls to the OpenAI API
    1. Creating New Files
@@ -8,10 +8,10 @@ This is a rust driver for Obsidian. It is meant to provide reusable interfaces f
    3. Appending to the current File
 3. Using Embeddings
 
-Planned optimizations include:
+**Planned optimizations include:**
 1. File Caching on load
 
-Some more advanced functionality is also planned but not implemented as of now like:
+**Some more advanced functionality is also planned but not implemented as of now like:**
 1. Finding Similar Notes with embeddings
 2. Merging Similar Notes found via embeddings
 3. Prompt structs for OpenAI API customization
