@@ -94,9 +94,7 @@ impl MDFile {
 
     // Embedding Methods
     pub async fn update_embedding(&mut self, driver: &crate::ai::api::AIDriver) -> (&PathBuf, Result<()>) {
-        println!("Updating embedding started for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
         if self.embedding.is_some() {
-            println!("Embedding already exists for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
             return (&self.path.as_ref().unwrap(), Ok(()));
         }
         let embedding = driver.get_embedding(&self.to_string()).await;
@@ -106,9 +104,9 @@ impl MDFile {
             let error = embedding.err().unwrap();
             return (&self.path.as_ref().unwrap(), Err(error));
         }
-        
+
         println!("Updating embedding finished for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
-        (&self.path.as_ref().unwrap(), Ok(()))  
+        (&self.path.as_ref().unwrap(), Ok(()))
     }
     pub fn get_embedding(&self) -> Option<&Vec<f64>> {
         self.embedding.as_ref()

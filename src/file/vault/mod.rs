@@ -53,7 +53,6 @@ impl Vault {
 		if !cache_path.exists() {
 			return Self::from_path(vault_root);
 		}
-		// println!("Cache path: {:?}", cache_path);
 		let cache_str: String = std::fs::read_to_string(cache_path)?;
 		let mut vault: Self = serde_json::from_str(&cache_str)?;
 
@@ -68,25 +67,18 @@ impl Vault {
 			let local_path = path.canonicalize()?;
 			let local_path = local_path.strip_prefix(&vault_root)?.to_path_buf();
 			if let std::collections::hash_map::Entry::Vacant(e) = vault.files.entry(local_path.clone()) {
-				println!("File not found in vault: {:?}", local_path.display());
 				let file = crate::file::File::read_file(path.clone())?;
 				e.insert(file);
 			} else {
-				
+
 				let file = vault.files.get_mut(&local_path).expect("File not found in vault");
 				let last_modified = std::fs::metadata(&path)?.modified()?.duration_since(std::time::SystemTime::UNIX_EPOCH)?.as_millis();
 				if file.last_modified < Some(last_modified) {
-					println!("File found in vault but not up to date: {:?}, stored last modified: {:?}, file last modified: {}", local_path.display(), file.last_modified, last_modified);
 					let contents = std::fs::read_to_string(&path)?;
 					*file = crate::file::File::new_raw(path.clone(), &path.extension().expect("No extension found").to_str().expect("Invalid extension"), contents, Some(last_modified))?;
 				}
-				else {
-					println!("File found in vault and up to date: {:?}", local_path.display());
-				}
 			}
 		}
-		// panic!();
-		// println!("Vault: {:?}", vault);
 		Ok(vault)
 	}
 
@@ -154,22 +146,19 @@ impl Vault {
 
 		for (path, file) in self.files.iter_mut() {
 			let last_modified = std::fs::metadata(&file.path)?.modified()?.elapsed()?.as_millis();
-			println!("Path: {:?}", path.display());
 			if file.get_mdfile().is_none() {
-				println!("No mdfile found for file: {:?}", path);
 				continue;
 			}
-			println!("file.get_mdfile().is_none(): {}", file.get_mdfile().is_none());
 			if file.last_modified <= Some(last_modified) && file.get_mdfile().as_ref().unwrap().get_embedding().is_some() {
-				println!("File: {:?} is up to date", path);
 				continue;
 			}
-			println!("file.last_modified <= Some(last_modified): {}", file.last_modified <= Some(last_modified));
-			println!("file.get_mdfile().as_ref().unwrap().get_embedding().is_some(): {}", file.get_mdfile().as_ref().unwrap().get_embedding().is_some());
 			if let Some(mdfile) = file.get_mdfile_mut() {
 				mdfiles.push(mdfile);
 			}
 		}
+
+		// let paths: Vec<&PathBuf> = mdfiles.iter().map(|mdfile| mdfile.get_path().unwrap()).collect();
+		// println!("Updating embeddings for files:\n{:?}", paths);
 
 		let mut futures = Vec::new();
 		for mdfile in mdfiles {
