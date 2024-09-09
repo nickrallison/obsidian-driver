@@ -31,7 +31,7 @@
 //! @public MDFile::get_embedding
 
 // std imports
-use std::path::{Path, PathBuf};
+use std::path::{Path};
 
 // third-party imports
 use regex::Regex;
