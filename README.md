@@ -9,8 +9,8 @@
 	- [ ] Reading Directories
 - [ ] Calls to the OpenAI API
 	- [ ] Creating New Files
-		- [ ] Modifying the current File
-		- [ ] Appending to the current File
+	- [ ] Modifying the current File
+	- [ ] Appending to the current File
 - [x] Using Embeddings
 	- [x] Nearest N Files
 	- [x] All Files closer than threshold
