@@ -3,27 +3,27 @@
 //! This module provides a driver for the OpenAI API.
 //!
 //! @public OpenAIConfig
-//! 
+//!
 //! @public OpenAIConfig::from_file
-//! 
+//!
 //! @super OpenAIDriver
-//! 
+//!
 //! @super OpenAIDriver::new
-//! 
+//!
 //! @super OpenAIDriver::new_no_validate
-//! 
+//!
 //! @super OpenAIDriver::get_embedding
-//! 
+//!
 //! @super OpenAIDriver::chat_smart
-//! 
+//!
 //! @super OpenAIDriver::chat_cheap
-//! 
+//!
 //! @super OpenAIValidator
-//! 
+//!
 //! @super OpenAIValidator::new
-//! 
+//!
 //! @super OpenAIValidator::validate
-//! 
+//!
 //! @private ChatMessage
 
 // std imports
@@ -70,7 +70,7 @@ impl OpenAIDriver {
     ///
     /// @super
     pub(super) async fn new(config: OpenAIConfig) -> Result<OpenAIDriver> {
-        config.validate().await;
+        config.validate().await?;
         Ok(OpenAIDriver {
             config,
             client: Client::new(),
@@ -326,8 +326,39 @@ impl OpenAIValidator {
             .await?;
 
         let response_text = response.text().await?;
-        panic!("{}", response_text);
+		let error = serde_json::from_str::<OpenAIValidationError>(&response_text);
+        match error {
+			Ok(e) => return Err(e.into()),
+			Err(_) => Ok(()),
+		}
+
     }
+}
+
+/// OpenAI API Error.
+///
+/// This struct provides an error for the OpenAI API.
+#[derive(thiserror::Error, Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct OpenAIValidationError {
+	error: OpenAIValidationErrorInner,
+}
+
+impl std::fmt::Display for OpenAIValidationError {
+	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+		write!(f, "{}", serde_json::to_string(self).unwrap())
+	}
+}
+
+/// OpenAI API Error Inner.
+///
+/// This struct provides an inner error for the OpenAI API.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+struct OpenAIValidationErrorInner {
+	message: String,
+	#[serde(rename = "type")]
+	ty: String,
+	param: Option<String>,
+	code: Option<String>,
 }
 
 /// Chat message for the OpenAI API.

@@ -46,4 +46,6 @@ pub enum Error {
     #[error(transparent)]
     StripPrefixError(#[from] std::path::StripPrefixError),
     
+	#[error(transparent)]
+	OpenAIValidationError(#[from] crate::ai::api::openai::OpenAIValidationError),
 }
