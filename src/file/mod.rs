@@ -1,4 +1,5 @@
 pub mod mdfile;
+pub mod vault;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -28,7 +29,8 @@ impl File {
     ) -> Result<Self> {
         match ext {
             "md" => {
-                let mdfile_contents = mdfile::MDFile::from_string(contents);
+                let mut mdfile_contents = mdfile::MDFile::from_string(contents);
+                mdfile_contents.set_path(Some(path.clone()));
                 Ok(Self {
                     path,
                     contents: FileContents::MDFile(mdfile_contents),
@@ -54,7 +56,7 @@ impl File {
                 "Invalid extension for file: {}",
                 path.display()
             )))?;
-        let last_modified = std::fs::metadata(&path)?.modified()?.elapsed()?.as_millis();
+        let last_modified = std::fs::metadata(&path)?.modified()?.duration_since(std::time::SystemTime::UNIX_EPOCH)?.as_millis();
         let contents = std::fs::read_to_string(&path)?;
         Self::new_raw(path, ext, contents, Some(last_modified))
     }
@@ -64,7 +66,7 @@ impl File {
     }
     pub fn read(path: PathBuf) -> Result<Self> {
         let cached = Self::read_cached(path.clone());
-        let file_last_modified = std::fs::metadata(&path)?.modified()?.elapsed()?.as_millis();
+        let file_last_modified = std::fs::metadata(&path)?.modified()?.duration_since(std::time::SystemTime::UNIX_EPOCH)?.as_millis();
         match cached {
             Ok(file) => {
                 if file.last_modified.unwrap() < file_last_modified {
@@ -119,10 +121,12 @@ mod file_tests {
         let contents: String = "# Test\n\nThis is a test file.".to_string();
         let ext: &str = "md";
         let actual = File::new_raw(path, ext, contents.clone(), last_modified).unwrap();
+        let mut expected_mdfile = mdfile::MDFile::from_string(contents);
+        expected_mdfile.set_path(Some(PathBuf::from("test.md")));
         let expected = File {
             path: PathBuf::from("test.md"),
             last_modified: None,
-            contents: FileContents::MDFile(mdfile::MDFile::from_string(contents)),
+            contents: FileContents::MDFile(expected_mdfile),
         };
         assert_eq!(actual, expected);
     }
