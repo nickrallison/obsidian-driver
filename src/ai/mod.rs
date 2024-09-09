@@ -52,14 +52,16 @@ pub mod prompt;
 /// use obsidian_driver::ai::api::AIDriver;
 /// use obsidian_driver::ai::prompt::{Prompt, Context};
 ///
-/// let openai_config_path = PathBuf::from("openai_config.json");
-/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
-/// let prompt: Prompt = Prompt::new("You are a helpful assistant", "Summarize the following text in your own words:\n\n$text$", 512);
-/// let mut context = Context::new();
-/// context.insert("text", "This is a test text, it could be anything, even the entire works of Shakespeare".to_string());
-/// let prompt: Prompt = prompt.substitute(&context).unwrap();
+/// async fn generate_file_example() {
+/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+/// 	let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
+/// 	let prompt: Prompt = Prompt::new("You are a helpful assistant", "Summarize the following text in your own words:\n\n$text$", 512);
+/// 	let mut context = Context::default();
+/// 	context.insert("text", "This is a test text, it could be anything, even the entire works of Shakespeare");
+/// 	let prompt: Prompt = prompt.substitute(&context).unwrap();
 ///
-/// let file = generate_file(&driver, prompt, context, "test.md".to_string(), PathBuf::from("output")).await.unwrap();
+/// 	let file = generate_file(&driver, prompt, context, "test.md".to_string(), PathBuf::from("output")).await.unwrap();
+/// }
 /// ```
 /// @public
 pub async fn generate_file(driver: &AIDriver, prompt: Prompt, context: Context, title: String, output_folder: PathBuf) -> Result<crate::file::File> {
@@ -92,14 +94,16 @@ pub async fn generate_file(driver: &AIDriver, prompt: Prompt, context: Context, 
 /// use obsidian_driver::ai::api::AIDriver;
 /// use obsidian_driver::ai::prompt::{Prompt, Context};
 ///
-/// let openai_config_path = PathBuf::from("openai_config.json");
-/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
-/// let file_prompt: Prompt = Prompt::new("You are a helpful assistant", "Summarize the following text in your own words:\n\n$text$", 512);
-/// let title_prompt: Prompt = Prompt::new("You are a helpful assistant", "Provide a title for the summary", 64);
-/// let mut context = Context::new();
-/// context.insert("text", "This is a test text, it could be anything, even the entire works of Shakespeare".to_string());
+/// async fn generate_file_and_title_example() {
+/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+/// 	let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
+/// 	let file_prompt: Prompt = Prompt::new("You are a helpful assistant", "Summarize the following text in your own words:\n\n$text$", 512);
+/// 	let title_prompt: Prompt = Prompt::new("You are a helpful assistant", "Provide a title for the summary", 64);
+/// 	let mut context = Context::default();
+/// 	context.insert("text", "This is a test text, it could be anything, even the entire works of Shakespeare");
 ///
-/// let file = generate_file_and_title(&driver, file_prompt, title_prompt, context, PathBuf::from("output")).await.unwrap();
+/// 	let file = generate_file_and_title(&driver, file_prompt, title_prompt, context, PathBuf::from("output")).await.unwrap();
+/// }
 /// ```
 /// @public
 pub async fn generate_file_and_title(driver: &AIDriver, file_prompt: Prompt, title_prompt: Prompt, context: Context, output_folder: PathBuf) -> Result<crate::file::File> {
@@ -189,7 +193,7 @@ This will be a filename, so only use characters which can make a valid filename 
 "#;
 
 /// Merge files into a single file
-/// 
+///
 /// todo: Implement this function
 pub async fn merge_files(files: Vec<crate::file::File>, output_folder: PathBuf) -> Result<crate::file::File> {
     todo!()

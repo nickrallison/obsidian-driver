@@ -1,6 +1,11 @@
+//! obsidian-driver
+//! 
+//! A library for interacting with Obsidian vaults.
+
+// public submodules
 pub mod ai;
 pub mod file;
-mod prelude;
 pub mod error;
 
-pub use prelude::*;
+// private submodules
+mod prelude;

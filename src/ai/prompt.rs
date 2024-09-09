@@ -47,7 +47,7 @@ use crate::prelude::*;
 /// use obsidian_driver::ai::prompt::{Prompt, Context};
 ///
 /// let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
-/// let mut context = Context::new();
+/// let mut context = Context::default();
 /// context.insert("name", "Bob");
 ///
 /// let actual = prompt.substitute(&context).unwrap();
@@ -95,7 +95,7 @@ impl Prompt {
 	/// use obsidian_driver::ai::prompt::{Prompt, Context};
 	///
 	/// let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
-	/// let mut context = Context::new();
+	/// let mut context = Context::default();
 	/// context.insert("name", "Bob");
 	///
 	/// let actual = prompt.substitute(&context).unwrap();
@@ -107,7 +107,7 @@ impl Prompt {
 	/// use obsidian_driver::ai::prompt::{Prompt, Context};
 	///
 	/// let prompt = Prompt::new("You are a helpful $profession$ named $name$", "This is a sample prompt for someone who's job is a(n) $profession$", 100);
-	/// let mut context = Context::new();
+	/// let mut context = Context::default();
 	/// context.insert("name", "Bob");
 	/// context.insert("profession", "assistant");
 	///
@@ -152,7 +152,7 @@ impl Prompt {
 /// ```
 /// use obsidian_driver::ai::prompt::Context;
 ///
-/// let context = Context::new();
+/// let context = Context::default();
 /// ```
 ///
 /// ```
@@ -178,38 +178,38 @@ pub struct Context {
 
 
 impl Context {
-	
+
 	/// Insert a key-value pair into the context.
-	/// 
+	///
 	/// # Arguments
 	/// @param key: &str - The key to insert.
 	/// @param value: &str - The value to insert.
-	/// 
+	///
 	/// # Examples
 	/// ```
 	/// use obsidian_driver::ai::prompt::Context;
-	/// 
-	/// let mut context = Context::new();
+	///
+	/// let mut context = Context::default();
 	/// context.insert("name", "Bob");
 	/// ```
 	pub fn insert(&mut self, key: &str, value: &str) {
 		self.context.insert(key.to_string(), value.to_string());
 	}
-	
+
 	/// Get the value of a key in the context.
-	/// 
+	///
 	/// # Arguments
 	/// @param key: &str - The key to get the value of.
 	/// @returns Option<&String> - The value of the key.
-	/// 
+	///
 	/// # Examples
-	/// 
+	///
 	/// ```
 	/// use obsidian_driver::ai::prompt::Context;
-	/// 
-	/// let mut context = Context::new();
+	///
+	/// let mut context = Context::default();
 	/// context.insert("name", "Bob");
-	/// 
+	///
 	/// let name = context.get("name").unwrap();
 	/// ```
 	pub fn get(&self, key: &str) -> Option<&String> {
@@ -246,7 +246,7 @@ mod prompt_tests {
 	#[test]
 	fn test_prompt_substitube_valid() {
 		let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
-		let mut context = Context::new();
+		let mut context = Context::default();
 		context.insert("name", "Bob");
 		let expected = Prompt::new("You are a helpful assistant named Bob", "This is a sample prompt", 100);
 		let actual = prompt.substitute(&context).unwrap();
@@ -256,7 +256,7 @@ mod prompt_tests {
 	#[test]
 	fn test_prompt_substitube_invalid() {
 		let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
-		let context = Context::new();
+		let context = Context::default();
 		let actual = prompt.substitute(&context);
 		assert!(actual.is_err());
 	}

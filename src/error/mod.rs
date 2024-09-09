@@ -1,5 +1,10 @@
 //! Main Crate Error
+//!
+//! This module contains the Error type and its implementations.
+//! 
+//! @public Error
 
+// std imports
 use std::path::PathBuf;
 
 #[derive(thiserror::Error, Debug)]

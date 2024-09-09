@@ -42,16 +42,4 @@
 	- [ ] Tags recommend based on file embeddings
 	- [ ] Tags recommend based on tag embeddings
 
-**Documentation Progress**
-
-- [ ] obsidian-driver
-	- [ ] ai
-		- [x] api
-			- [x] openai
-		- [x] prompt
-	- [ ] file
-		- [ ] mdfile
-			- [ ] yaml
-		- [ ] vault
-	- [ ] error
 

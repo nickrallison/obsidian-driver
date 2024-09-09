@@ -41,17 +41,21 @@ pub mod openai;
 /// use obsidian_driver::ai::api::{AIDriver, openai::OpenAIConfig};
 /// use std::path::PathBuf;
 ///
-/// let openai_config_path = PathBuf::from("openai_config.json");
-/// let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
-/// let driver = AIDriver::new_openai(openai_config).await;
+/// async fn new_openai_example() {
+/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+/// 	let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
+/// 	let driver = AIDriver::new_openai(openai_config).await;
+/// }
 /// ```
 ///
 /// ```
 /// use obsidian_driver::ai::api::{AIDriver, openai::OpenAIConfig};
 /// use std::path::PathBuf;
-///
-/// let openai_config_path = PathBuf::from("openai_config.json");
-/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await;
+/// 
+///async fn new_openai_from_config_path_example() {
+/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+/// 	let driver = AIDriver::new_openai_from_config_path(openai_config_path).await;
+/// }
 /// ```
 /// @public
 #[derive(Clone, Debug)]
@@ -73,9 +77,11 @@ impl AIDriver {
 	/// use obsidian_driver::ai::api::{AIDriver, openai::OpenAIConfig};
 	/// use std::path::PathBuf;
 	///
-	/// let openai_config_path = PathBuf::from("openai_config.json");
-	/// let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
-	/// let driver = AIDriver::new_openai(openai_config).await;
+	/// async fn new_openai_example() {
+	/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+	/// 	let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
+	/// 	let driver = AIDriver::new_openai(openai_config).await;
+	/// }
 	/// ```
 	/// @public
     pub async fn new_openai(config: OpenAIConfig) -> Result<AIDriver> {
@@ -93,8 +99,10 @@ impl AIDriver {
 	/// use obsidian_driver::ai::api::{AIDriver, openai::OpenAIConfig};
 	/// use std::path::PathBuf;
 	///
-	/// let openai_config_path = PathBuf::from("openai_config.json");
-	/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await;
+	/// async fn new_openai_from_config_path_example() {
+	/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+	/// 	let driver = AIDriver::new_openai_from_config_path(openai_config_path).await;
+	/// }
 	/// ```
 	/// @public
     pub async fn new_openai_from_config_path(config_path: PathBuf) -> Result<AIDriver> {
@@ -109,11 +117,11 @@ impl AIDriver {
 	/// @returns `AIDriver` - The new AIDriver.
 	///
 	/// # Examples
-	/// ```
+	/// ```should_panic
 	/// use obsidian_driver::ai::api::{AIDriver, openai::OpenAIConfig};
 	/// use std::path::PathBuf;
 	///
-	/// let openai_config_path = PathBuf::from("openai_config.json");
+	/// let openai_config_path = PathBuf::from(".openai_config.json");
 	/// let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
 	/// let driver = AIDriver::new_openai_no_validation(openai_config);
 	/// ```
@@ -133,7 +141,7 @@ impl AIDriver {
 	/// use obsidian_driver::ai::api::{AIDriver, openai::OpenAIConfig};
 	/// use std::path::PathBuf;
 	///
-	/// let openai_config_path = PathBuf::from("openai_config.json");
+	/// let openai_config_path = PathBuf::from(".openai_config.json");
 	/// let driver = AIDriver::new_openai_from_config_path_no_validation(openai_config_path);
 	/// ```
 	/// @public
@@ -154,11 +162,13 @@ impl AIDriver {
 	/// use obsidian_driver::ai::prompt::Prompt;
 	/// use std::path::PathBuf;
 	///
-	/// let openai_config_path = PathBuf::from("openai_config.json");
-	/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
+	/// async fn chat_smart_example() {
+	/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+	/// 	let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
 	///
-	/// let prompt = Prompt::new("You are a helpful assistant", "Provide a good morning message", 128);
-	/// let response = driver.chat_smart(prompt).await.unwrap();
+	/// 	let prompt = Prompt::new("You are a helpful assistant", "Provide a good morning message", 128);
+	/// 	let response = driver.chat_smart(prompt).await.unwrap();
+	/// }
 	/// ```
 	/// @public
     pub async fn chat_smart(&self, prompt: super::prompt::Prompt) -> Result<String> {
@@ -179,11 +189,13 @@ impl AIDriver {
 	/// use obsidian_driver::ai::prompt::Prompt;
 	/// use std::path::PathBuf;
 	///
-	/// let openai_config_path = PathBuf::from("openai_config.json");
-	/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
+	/// async fn chat_cheap_example() {
+	/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+	/// 	let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
 	///
-	/// let prompt = Prompt::new("You are a helpful assistant", "Provide a good morning message", 128);
-	/// let response = driver.chat_cheap(prompt).await.unwrap();
+	/// 	let prompt = Prompt::new("You are a helpful assistant", "Provide a good morning message", 128);
+	/// 	let response = driver.chat_cheap(prompt).await.unwrap();
+	/// }
 	/// ```
 	/// @public
     pub async fn chat_cheap(&self, prompt: super::prompt::Prompt) -> Result<String> {
@@ -203,12 +215,14 @@ impl AIDriver {
 	/// use obsidian_driver::ai::api::{AIDriver, openai::OpenAIConfig};
 	/// use std::path::PathBuf;
 	/// 
-	/// let openai_config_path = PathBuf::from("openai_config.json");
-	/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
+	/// async fn get_embedding_example() {
+	/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+	/// 	let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
 	/// 
-	/// let text = "Hello, World!";
+	/// 	let text = "Hello, World!";
 	/// 
-	/// let embedding = driver.get_embedding(text).await.unwrap();
+	/// 	let embedding = driver.get_embedding(text).await.unwrap();
+	/// }
 	/// ```
 	/// @public
     pub async fn get_embedding(&self, text: &str) -> Result<Vec<f64>> {

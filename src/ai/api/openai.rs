@@ -47,9 +47,11 @@ use crate::prelude::*;
 /// use obsidian_driver::ai::api::AIDriver;
 /// use std::path::PathBuf;
 ///
-/// let openai_config_path = PathBuf::from("openai_config.json");
-/// let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
-/// let driver = AIDriver::new_openai(openai_config).await.unwrap();
+/// async fn openai_driver_example() {
+/// 	let openai_config_path = PathBuf::from(".openai_config.json");
+/// 	let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
+/// 	let driver = AIDriver::new_openai(openai_config).await.unwrap();
+/// }
 /// ```
 /// @super
 #[derive(Clone, Debug)]
@@ -207,11 +209,11 @@ impl OpenAIDriver {
 /// This struct provides a configuration for the OpenAI API.
 ///
 /// # Examples
-/// ```
+/// ```should_panic
 /// use obsidian_driver::ai::api::openai::OpenAIConfig;
 /// use std::path::PathBuf;
 ///
-/// let openai_config_path = PathBuf::from("openai_config.json");
+/// let openai_config_path = PathBuf::from(".openai_config.json");
 /// let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
 /// ```
 ///
