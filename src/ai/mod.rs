@@ -1,15 +1,67 @@
+//! # obsidian-driver::ai
+//!
+//! This module contains the AI API for the Obsidian Driver. The AI API provides a high-level interface to the AI models.
+//!
+//! @public api
+//!
+//! @public prompt
+//!
+//! @public generate_file
+//!
+//! @public generate_file_and_title
+//!
+//! @public merge_files
+
+// std imports
 use std::path::PathBuf;
+
+// third-party imports
 use futures::future;
 
-use crate::ai::api::AIDriver;
-use crate::ai::prompt::{Context, Prompt};
+// first-party imports
 use crate::file::mdfile::MDFile;
+use crate::prelude::*;
 
-pub use crate::prelude::*;
+// module imports
+use api::AIDriver;
+use prompt::{Context, Prompt};
 
+// submodules
 pub mod api;
 pub mod prompt;
 
+
+/// Generate a file from a prompt and context
+///
+/// This function takes a prompt and a context and generates a file from the prompt. The prompt is substituted with the context and then passed to the AI model to generate the file. The file is then converted to a `crate::file::File` and returned.
+///
+/// # Arguments
+/// @param driver: &AIDriver - The AI driver to use for generating the file
+/// @param prompt: Prompt - The prompt to generate the file from
+/// @param context: Context - The context to substitute into the prompt
+/// @param title: String - The title of the file
+/// @param output_folder: PathBuf - The output folder to save the file in
+/// @returns Result<crate::file::File> - The generated file
+///
+/// # Example
+///
+/// ```
+/// use std::path::PathBuf;
+///
+/// use obsidian_driver::ai::generate_file;
+/// use obsidian_driver::ai::api::AIDriver;
+/// use obsidian_driver::ai::prompt::{Prompt, Context};
+///
+/// let openai_config_path = PathBuf::from("openai_config.json");
+/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
+/// let prompt: Prompt = Prompt::new("You are a helpful assistant", "Summarize the following text in your own words:\n\n$text$", 512);
+/// let mut context = Context::new();
+/// context.insert("text", "This is a test text, it could be anything, even the entire works of Shakespeare".to_string());
+/// let prompt: Prompt = prompt.substitute(&context).unwrap();
+///
+/// let file = generate_file(&driver, prompt, context, "test.md".to_string(), PathBuf::from("output")).await.unwrap();
+/// ```
+/// @public
 pub async fn generate_file(driver: &AIDriver, prompt: Prompt, context: Context, title: String, output_folder: PathBuf) -> Result<crate::file::File> {
     let prompt: Prompt = prompt.substitute(&context)?;
     let file: String = driver.chat_smart(prompt).await?;
@@ -20,6 +72,36 @@ pub async fn generate_file(driver: &AIDriver, prompt: Prompt, context: Context, 
 
 }
 
+/// Generate a file and title from a file prompt and title prompt
+///
+/// This function takes a file prompt and a title prompt and generates a file and title from the prompts. The prompts are substituted with the context and then passed to the AI model to generate the file and title. The file is then converted to a `crate::file::File` and returned.
+///
+/// # Arguments
+/// @param driver: &AIDriver - The AI driver to use for generating the file
+/// @param file_prompt: Prompt - The prompt to generate the file from
+/// @param title_prompt: Prompt - The prompt to generate the title from
+/// @param context: Context - The context to substitute into the prompts
+/// @param output_folder: PathBuf - The output folder to save the file in
+/// @returns Result<crate::file::File> - The generated file
+///
+/// # Example
+/// ```
+/// use std::path::PathBuf;
+///
+/// use obsidian_driver::ai::generate_file_and_title;
+/// use obsidian_driver::ai::api::AIDriver;
+/// use obsidian_driver::ai::prompt::{Prompt, Context};
+///
+/// let openai_config_path = PathBuf::from("openai_config.json");
+/// let driver = AIDriver::new_openai_from_config_path(openai_config_path).await.unwrap();
+/// let file_prompt: Prompt = Prompt::new("You are a helpful assistant", "Summarize the following text in your own words:\n\n$text$", 512);
+/// let title_prompt: Prompt = Prompt::new("You are a helpful assistant", "Provide a title for the summary", 64);
+/// let mut context = Context::new();
+/// context.insert("text", "This is a test text, it could be anything, even the entire works of Shakespeare".to_string());
+///
+/// let file = generate_file_and_title(&driver, file_prompt, title_prompt, context, PathBuf::from("output")).await.unwrap();
+/// ```
+/// @public
 pub async fn generate_file_and_title(driver: &AIDriver, file_prompt: Prompt, title_prompt: Prompt, context: Context, output_folder: PathBuf) -> Result<crate::file::File> {
     let file_prompt: Prompt = file_prompt.substitute(&context)?;
     let title_prompt: Prompt = title_prompt.substitute(&context)?;
@@ -106,7 +188,9 @@ This will be a filename, so only use characters which can make a valid filename 
 (Short Title)
 "#;
 
-
+/// Merge files into a single file
+/// 
+/// todo: Implement this function
 pub async fn merge_files(files: Vec<crate::file::File>, output_folder: PathBuf) -> Result<crate::file::File> {
     todo!()
 }

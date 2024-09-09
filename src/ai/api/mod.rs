@@ -1,6 +1,6 @@
 //! # obsidian-driver::ai::api
 //!
-//! This module contains the AI API, which is a high-level interface to the AI models.
+//! This module contains the interface for interacting with external AI models through their APIs. The AI models are used to generate content for the Obsidian Driver.
 //!
 //! @public openai
 //!
