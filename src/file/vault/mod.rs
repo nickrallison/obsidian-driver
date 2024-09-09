@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use std::path::PathBuf;
+use kdtree::distance::squared_euclidean;
+use kdtree::KdTree;
 use serde::{Deserialize, Serialize};
 use crate::file::mdfile::MDFile;
 
@@ -17,7 +19,6 @@ pub struct Vault {
 
 	#[serde(skip)]
 	aidriver: Option<crate::ai::api::AIDriver>,
-
 }
 
 impl Vault {
@@ -174,5 +175,87 @@ impl Vault {
 		}
 
 		Ok(())
+	}
+
+	// where path should be relative to the vault root
+	pub fn get_closest_files(&self, path: &PathBuf, n: usize) -> Result<Vec<(PathBuf, f64)>> {
+
+
+		let file = self.files.get(path).ok_or(Error::Generic(f!("Path Not Found: {}", path.display())))?;
+		let mdfile = file.get_mdfile().ok_or(Error::Generic(f!("Not MDFile: {}", path.display())))?;
+		let embedding = mdfile.get_embedding().ok_or(Error::Generic(f!("Noo embedding for file: {}", path.display())))?;
+
+		let mut embeddings = Vec::new();
+
+		for (other_path, other_file) in self.files.iter() {
+			// if other_path == path {
+			// 	continue;
+			// }
+			let other_mdfile = other_file.get_mdfile();
+			if other_mdfile.is_none() {
+				continue;
+			}
+			let other_mdfile = other_mdfile.unwrap();
+			let other_embedding = other_mdfile.get_embedding();
+			if other_embedding.is_none() {
+				continue;
+			}
+			let other_embedding = other_embedding.unwrap();
+
+			embeddings.push(other_embedding.clone());
+		}
+
+		let dimensions = embedding.len();
+		let mut kdtree = KdTree::new(dimensions);
+
+		for (i, embedding) in embeddings.iter().enumerate() {
+			kdtree.add(embedding, i).unwrap();
+		}
+
+		let nearest: Vec<(f64, &usize)> = kdtree.nearest(embedding, n, &squared_euclidean).unwrap();
+		let mut distances = Vec::new();
+		for (distance, &index) in nearest {
+			let other_path = self.files.keys().nth(index).unwrap();
+			distances.push((other_path.clone(), distance.sqrt()));
+		}
+		Ok(distances)
+	}
+
+	pub fn get_closest_files_by_threshold(&self, path: &PathBuf, threshold: f64) -> Result<Vec<(PathBuf, f64)>> {
+		let file = self.files.get(path).ok_or(Error::Generic(f!("Path Not Found: {}", path.display())))?;
+		let mdfile = file.get_mdfile().ok_or(Error::Generic(f!("Not MDFile: {}", path.display())))?;
+		let embedding = mdfile.get_embedding().ok_or(Error::Generic(f!("Noo embedding for file: {}", path.display())))?;
+
+		let mut embeddings = Vec::new();
+
+		for (other_path, other_file) in self.files.iter() {
+			let other_mdfile = other_file.get_mdfile();
+			if other_mdfile.is_none() {
+				continue;
+			}
+			let other_mdfile = other_mdfile.unwrap();
+			let other_embedding = other_mdfile.get_embedding();
+			if other_embedding.is_none() {
+				continue;
+			}
+			let other_embedding = other_embedding.unwrap();
+
+			embeddings.push(other_embedding.clone());
+		}
+
+		let dimensions = embedding.len();
+		let mut kdtree = KdTree::new(dimensions);
+
+		for (i, embedding) in embeddings.iter().enumerate() {
+			kdtree.add(embedding, i).unwrap();
+		}
+		let threshold = threshold.powi(2);
+		let nearest: Vec<(f64, &usize)> = kdtree.iter_nearest(embedding, &squared_euclidean).unwrap().filter(|(distance, _)| *distance <= threshold).collect();
+		let mut distances = Vec::new();
+		for (distance, &index) in nearest {
+			let other_path = self.files.keys().nth(index).unwrap();
+			distances.push((other_path.clone(), distance.sqrt()));
+		}
+		Ok(distances)
 	}
 }

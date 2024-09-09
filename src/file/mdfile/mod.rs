@@ -105,7 +105,7 @@ impl MDFile {
             return (&self.path.as_ref().unwrap(), Err(error));
         }
 
-        println!("Updating embedding finished for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
+        println!("Updating embedding for file: {:?}", &self.path.as_ref().map(|p| p.to_string_lossy()));
         (&self.path.as_ref().unwrap(), Ok(()))
     }
     pub fn get_embedding(&self) -> Option<&Vec<f64>> {
