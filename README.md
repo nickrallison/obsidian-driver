@@ -9,19 +9,22 @@
     - [ ] Reading Directories
 - [ ] Calls to the OpenAI API
     - [ ] Creating New Files
-    - [ ] Modifying the current File
-    - [ ] Appending to the current File
-- [ ] Using Embeddings
+	  - [ ] Modifying the current File
+	  - [ ] Appending to the current File
+- [x] Using Embeddings
+	  - [x] Nearest N Files
+	  - [x] All Files closer than threshold
 
 **Planned optimizations include:**
+- [x] File Caching on load
+	  - [x] Using Cached Files to not repeat embeddings
 
-- [ ] File Caching on load
-
-**Some more advanced functionality is also planned but not implemented as of now like:**
-
-- [ ] Finding Similar Notes with embeddings
-- [ ] Merging Similar Notes found via embeddings
+**Some more advanced functionality is also planned:**
+- [x] Finding Similar Notes with embeddings
+- [ ] Merging Similar Notes found via embeddings 
 - [ ] Prompt structs for OpenAI API customization
+	  - [ ] Either do action
+ 	  - [ ] Or print the simplified prompt
 - [ ] Transcribing different information formats like the following into markdown:
     - [ ] Files
         - [ ] Text Files (duh)
@@ -34,6 +37,8 @@
 - [ ] Mapping existing links between files
     - [ ] Finding links with embeddings that don't match to show possible bad links
 - [ ] Recommend Tags Based on existing tags / need new tag
+	  - [ ] Tags recommend based on file embeddings
+ 	  - [ ] Tags recommend based on tag embeddings
 
 **Documentation Progress**
 
@@ -47,3 +52,4 @@
             - [ ] yaml
         - [ ] vault
     - [ ] error
+
