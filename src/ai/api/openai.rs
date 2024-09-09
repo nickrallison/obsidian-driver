@@ -66,8 +66,8 @@ impl OpenAIDriver {
     /// @returns OpenAIDriver - The new OpenAIDriver instance.
     ///
     /// @super
-    pub(super) async fn new_no_validate(config: OpenAIConfig) -> OpenAIDriver {
-        OpenAIDriver {
+    pub(super) fn new_no_validate(config: OpenAIConfig) -> OpenAIDriver {
+        OpenAIDriver{
             config,
             client: Client::new(),
         }
