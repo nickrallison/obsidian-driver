@@ -46,9 +46,9 @@
 
 - [ ] obsidian-driver
 	- [ ] ai
-		- [ ] api
+		- [x] api
 			- [x] openai
-		- [ ] prompt
+		- [x] prompt
 	- [ ] file
 		- [ ] mdfile
 			- [ ] yaml

@@ -3,22 +3,37 @@
 //! This module provides a driver for the OpenAI API.
 //!
 //! @public OpenAIConfig
+//! 
 //! @public OpenAIConfig::from_file
+//! 
 //! @super OpenAIDriver
+//! 
 //! @super OpenAIDriver::new
+//! 
 //! @super OpenAIDriver::new_no_validate
+//! 
 //! @super OpenAIDriver::get_embedding
+//! 
 //! @super OpenAIDriver::chat_smart
+//! 
 //! @super OpenAIDriver::chat_cheap
+//! 
 //! @super OpenAIValidator
+//! 
 //! @super OpenAIValidator::new
+//! 
 //! @super OpenAIValidator::validate
+//! 
 //! @private ChatMessage
 
-use reqwest::Client;
-use serde::{Deserialize, Serialize};
+// std imports
 use std::path::PathBuf;
 
+// third-party imports
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
+
+// first-party imports
 use crate::prelude::*;
 
 /// Driver for the OpenAI API.
@@ -34,7 +49,7 @@ use crate::prelude::*;
 ///
 /// let openai_config_path = PathBuf::from("openai_config.json");
 /// let openai_config = OpenAIConfig::from_file(openai_config_path).unwrap();
-/// let driver = AIDriver::new_openai(openai_config);
+/// let driver = AIDriver::new_openai(openai_config).await.unwrap();
 /// ```
 /// @super
 #[derive(Clone, Debug)]
@@ -48,8 +63,8 @@ impl OpenAIDriver {
     /// Internal constructor to create a new OpenAIDriver instance.
     ///
     /// # Arguments
-    /// @param config: OpenAIConfig - The configuration for the OpenAI API.
-    /// @returns Result<OpenAIDriver> - The new OpenAIDriver instance.
+    /// @param `config`: `OpenAIConfig` - The configuration for the OpenAI API.
+    /// @returns `Result<OpenAIDriver>` - The new OpenAIDriver instance.
     ///
     /// @super
     pub(super) async fn new(config: OpenAIConfig) -> Result<OpenAIDriver> {
@@ -62,8 +77,8 @@ impl OpenAIDriver {
     /// Internal constructor to create a new OpenAIDriver instance without validation.
     ///
     /// # Arguments
-    /// @param config: OpenAIConfig - The configuration for the OpenAI API.
-    /// @returns OpenAIDriver - The new OpenAIDriver instance.
+    /// @param `config`: `OpenAIConfig` - The configuration for the OpenAI API.
+    /// @returns `OpenAIDriver` - The new OpenAIDriver instance.
     ///
     /// @super
     pub(super) fn new_no_validate(config: OpenAIConfig) -> OpenAIDriver {
@@ -76,8 +91,8 @@ impl OpenAIDriver {
     /// Get the embedding for a given text.
     ///
     /// # Arguments
-    /// @param text: &str - The text to get the embedding for.
-    /// @returns Result<Vec<f64>> - The embedding for the text.
+    /// @param `text`: `&str` - The text to get the embedding for.
+    /// @returns `Result<Vec<f64>>` - The embedding for the text.
     ///
     /// @super
     pub(super) async fn get_embedding(&self, text: &str) -> Result<Vec<f64>> {
@@ -109,8 +124,8 @@ impl OpenAIDriver {
     /// Chat with the smart model.
     ///
     /// # Arguments
-    /// @param prompt: crate::ai::prompt::Prompt - The prompt to chat with.
-    /// @returns Result<String> - The response from the chat.
+    /// @param `prompt`: `crate::ai::prompt::Prompt` - The prompt to chat with.
+    /// @returns `Result<String>` - The response from the chat.
     ///
     /// @super
     pub(super) async fn chat_smart(&self, prompt: crate::ai::prompt::Prompt) -> Result<String> {
@@ -149,8 +164,8 @@ impl OpenAIDriver {
     /// Chat with the cheap model.
     ///
     /// # Arguments
-    /// @param prompt: crate::ai::prompt::Prompt - The prompt to chat with.
-    /// @returns Result<String> - The response from the chat.
+    /// @param `prompt`: `crate::ai::prompt::Prompt` - The prompt to chat with.
+    /// @returns `Result<String>` - The response from the chat.
     ///
     /// @super
     pub(super) async fn chat_cheap(&self, prompt: crate::ai::prompt::Prompt) -> Result<String> {
@@ -246,7 +261,7 @@ impl OpenAIConfig {
     /// Validate the OpenAIConfig.
     ///
     /// # Arguments
-    /// @returns Result<()> - The result of the validation.
+    /// @returns `Result<()>` - The result of the validation.
     ///
     /// @private
     async fn validate(&self) -> Result<()> {
@@ -257,8 +272,8 @@ impl OpenAIConfig {
     /// Create an OpenAIConfig from a file.
     ///
     /// # Arguments
-    /// @param config_path: PathBuf - The path to the configuration file.
-    /// @returns Result<OpenAIConfig> - The OpenAIConfig from the file.
+    /// @param `config_path`: `PathBuf` - The path to the configuration file.
+    /// @returns `Result<OpenAIConfig>` - The OpenAIConfig from the file.
     ///
     /// @public
     pub fn from_file(config_path: PathBuf) -> Result<OpenAIConfig> {
@@ -283,8 +298,8 @@ impl OpenAIValidator {
     /// Internal constructor to create a new OpenAIValidator instance.
     ///
     /// # Arguments
-    /// @param config: OpenAIConfig - The configuration for the OpenAI API.
-    /// @returns OpenAIValidator - The new OpenAIValidator instance.
+    /// @param `config`: `OpenAIConfig` - The configuration for the OpenAI API.
+    /// @returns `OpenAIValidator` - The new OpenAIValidator instance.
     ///
     /// @super
     pub(super) fn new(config: OpenAIConfig) -> OpenAIValidator {
@@ -297,7 +312,7 @@ impl OpenAIValidator {
     /// Validate the OpenAI API.
     ///
     /// # Arguments
-    /// @returns Result<()> - The result of the validation.
+    /// @returns `Result<()>` - The result of the validation.
     ///
     /// @super
     pub(super) async fn validate(&self) -> Result<()> {

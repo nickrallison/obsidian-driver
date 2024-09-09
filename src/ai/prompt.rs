@@ -1,12 +1,59 @@
+//! # obsidian-driver::ai::prompt
+//!
+//! This module contains the Prompt struct and the Context struct.
+//!
+//! @public Prompt
+//!
+//! @public Prompt::new
+//!
+//! @public Prompt::substitute
+//!
+//! @public Context
+//!
+//! @public Context::default
+//!
+//! @public Context::from<HashMap<String, String>>
+//!
+//! @public Context::insert
+//!
+//! @public Context::get
+
+// std imports
 use std::collections::HashMap;
 use std::fmt::Display;
+
+// third-party imports
 use serde::{Serialize, Deserialize};
 
+// first-party imports
 use crate::prelude::*;
 
 
 // Any substrings surrounded by $ will be replaced with the value of the key in the context when prompted
 // or return an error if the key is not found
+
+/// The Prompt struct.
+///
+/// This struct contains the system prompt, user prompt, and the maximum number of characters allowed in the response.
+///
+/// # Examples
+/// ```
+/// use obsidian_driver::ai::prompt::Prompt;
+///
+/// let prompt = Prompt::new("You are a helpful assistant", "This is a sample prompt", 100);
+/// ```
+///
+/// ```
+/// use obsidian_driver::ai::prompt::{Prompt, Context};
+///
+/// let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
+/// let mut context = Context::new();
+/// context.insert("name", "Bob");
+///
+/// let actual = prompt.substitute(&context).unwrap();
+/// let expected = Prompt::new("You are a helpful assistant named Bob", "This is a sample prompt", 100);
+/// assert_eq!(actual, expected);
+/// ```
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Prompt {
 	pub system_prompt: String,
@@ -15,6 +62,20 @@ pub struct Prompt {
 }
 
 impl Prompt {
+	/// Create a new Prompt.
+	///
+	/// # Arguments
+	/// @param system_prompt: &str - The system prompt.
+	/// @param user_prompt: &str - The user prompt.
+	/// @param max_characters: u32 - The maximum number of characters allowed in the response.
+	/// @returns Prompt - The new Prompt.
+	///
+	/// # Examples
+	/// ```
+	/// use obsidian_driver::ai::prompt::Prompt;
+	///
+	/// let prompt = Prompt::new("You are a helpful assistant", "This is a sample prompt", 100);
+	/// ```
 	pub fn new(system_prompt: &str, user_prompt: &str, max_characters: u32) -> Prompt {
 		Prompt {
 			system_prompt: system_prompt.to_string(),
@@ -22,6 +83,38 @@ impl Prompt {
 			max_characters,
 		}
 	}
+
+	/// Substitute the keys in the prompt with the values in the context.
+	///
+	/// # Arguments
+	/// @param context: &Context - The context to substitute the keys with.
+	/// @returns Result<Prompt> - The new Prompt with the keys substituted.
+	///
+	/// # Examples
+	/// ```
+	/// use obsidian_driver::ai::prompt::{Prompt, Context};
+	///
+	/// let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
+	/// let mut context = Context::new();
+	/// context.insert("name", "Bob");
+	///
+	/// let actual = prompt.substitute(&context).unwrap();
+	/// let expected = Prompt::new("You are a helpful assistant named Bob", "This is a sample prompt", 100);
+	/// assert_eq!(actual, expected);
+	/// ```
+	///
+	/// ```
+	/// use obsidian_driver::ai::prompt::{Prompt, Context};
+	///
+	/// let prompt = Prompt::new("You are a helpful $profession$ named $name$", "This is a sample prompt for someone who's job is a(n) $profession$", 100);
+	/// let mut context = Context::new();
+	/// context.insert("name", "Bob");
+	/// context.insert("profession", "assistant");
+	///
+	/// let actual = prompt.substitute(&context).unwrap();
+	/// let expected = Prompt::new("You are a helpful assistant named Bob", "This is a sample prompt for someone who's job is a(n) assistant", 100);
+	/// assert_eq!(actual, expected);
+	/// ```
 	pub fn substitute(&self, context: &Context) -> Result<Self> {
 		let mut system_prompt = self.system_prompt.clone();
 		let mut user_prompt = self.user_prompt.clone();
@@ -51,27 +144,84 @@ impl Prompt {
 	}
 }
 
+/// The Context struct.
+///
+/// This struct contains a hashmap of keys and values.
+///
+/// # Examples
+/// ```
+/// use obsidian_driver::ai::prompt::Context;
+///
+/// let context = Context::new();
+/// ```
+///
+/// ```
+/// use obsidian_driver::ai::prompt::Context;
+///
+/// let mut context = Context::default();
+/// context.insert("name", "Bob");
+/// let name = context.get("name").unwrap();
+/// ```
+///
+/// ```
+/// use obsidian_driver::ai::prompt::Context;
+/// use std::collections::HashMap;
+///
+/// let mut map = HashMap::new();
+/// map.insert("name".to_string(), "Bob".to_string());
+/// let context = Context::from(map);
+/// ```
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct Context {
 	context: HashMap<String, String>,
 }
 
-impl Default for Context {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 impl Context {
-	pub fn new() -> Context {
-		Context {
-			context: HashMap::new(),
-		}
-	}
+	
+	/// Insert a key-value pair into the context.
+	/// 
+	/// # Arguments
+	/// @param key: &str - The key to insert.
+	/// @param value: &str - The value to insert.
+	/// 
+	/// # Examples
+	/// ```
+	/// use obsidian_driver::ai::prompt::Context;
+	/// 
+	/// let mut context = Context::new();
+	/// context.insert("name", "Bob");
+	/// ```
 	pub fn insert(&mut self, key: &str, value: &str) {
 		self.context.insert(key.to_string(), value.to_string());
 	}
+	
+	/// Get the value of a key in the context.
+	/// 
+	/// # Arguments
+	/// @param key: &str - The key to get the value of.
+	/// @returns Option<&String> - The value of the key.
+	/// 
+	/// # Examples
+	/// 
+	/// ```
+	/// use obsidian_driver::ai::prompt::Context;
+	/// 
+	/// let mut context = Context::new();
+	/// context.insert("name", "Bob");
+	/// 
+	/// let name = context.get("name").unwrap();
+	/// ```
 	pub fn get(&self, key: &str) -> Option<&String> {
 		self.context.get(key)
+	}
+}
+
+impl From<HashMap<String, String>> for Context {
+	fn from(context: HashMap<String, String>) -> Self {
+		Context {
+			context
+		}
 	}
 }
 
