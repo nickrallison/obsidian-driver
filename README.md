@@ -18,7 +18,7 @@
 - [x] File Caching on load
 	- [x] Using Cached Files to not repeat embeddings
 
-**Some more advanced functionality is also planned but not implemented as of now like:**
+**Some more advanced functionality is also planned:**
 - [x] Finding Similar Notes with embeddings
 - [ ] Merging Similar Notes found via embeddings 
 - [ ] Prompt structs for OpenAI API customization
