@@ -49,15 +49,15 @@ impl Vault {
     pub fn from_path(vault_root: PathBuf) -> Result<Self> {
         let mut files = HashMap::new();
         let vault_root = vault_root.canonicalize()?;
-        for entry in std::fs::read_dir(&vault_root)? {
+        for entry in walkdir::WalkDir::new(&vault_root) {
             let entry = entry?;
-            let path = entry.path();
-            let file = crate::file::File::read_file(path.clone())?;
-
-            let path = path.canonicalize()?;
-            let path = path.strip_prefix(&vault_root)?.to_path_buf();
-
-            files.insert(path.clone(), file);
+            let path = entry.path().to_path_buf();
+            if path.is_file() {
+                let file = crate::file::File::read_file(path.clone())?;
+                let path = path.canonicalize()?;
+                let path = path.strip_prefix(&vault_root)?.to_path_buf();
+                files.insert(path.clone(), file);
+            }
         }
 
         let aidriver = None;
@@ -98,15 +98,18 @@ impl Vault {
         vault.vault_root.clone_from(&vault_root);
 
         // for all files in vault root, insert / update them if they are not in the cache / not up to date
-        for entry in std::fs::read_dir(&vault_root)? {
+        for entry in walkdir::WalkDir::new(&vault_root) {
             let entry = entry?;
             let path = entry.path();
+            if !path.is_file() {
+                continue;
+            }
             let local_path = path.canonicalize()?;
             let local_path = local_path.strip_prefix(&vault_root)?.to_path_buf();
             if let std::collections::hash_map::Entry::Vacant(e) =
                 vault.files.entry(local_path.clone())
             {
-                let file = crate::file::File::read_file(path.clone())?;
+                let file = crate::file::File::read_file(path.to_path_buf())?;
                 e.insert(file);
             } else {
                 let file = vault
@@ -120,7 +123,7 @@ impl Vault {
                 if file.last_modified < Some(last_modified) {
                     let contents = std::fs::read_to_string(&path)?;
                     *file = crate::file::File::new_raw(
-                        path.clone(),
+                        path.to_path_buf(),
                         path.extension()
                             .expect("No extension found")
                             .to_str()
@@ -170,11 +173,11 @@ impl Vault {
         Ok(())
     }
 
-	/// Add a file to the Vault from a path.
-	/// 
-	/// # Arguments
-	/// @param path: PathBuf
-	/// @return Result<()>
+    /// Add a file to the Vault from a path.
+    ///
+    /// # Arguments
+    /// @param path: PathBuf
+    /// @return Result<()>
     pub fn add_path(&mut self, path: PathBuf) -> Result<()> {
         if !path.starts_with(&self.vault_root) {
             return Err(Error::PathNotInVaultRoot(path, self.vault_root.clone()));
@@ -189,45 +192,45 @@ impl Vault {
         Ok(())
     }
 
-	/// Get a file from the Vault. Uses the path relative to the vault root.
-	/// 
-	/// # Arguments
-	/// @param path: &PathBuf
-	/// @return Option<&crate::file::File>
+    /// Get a file from the Vault. Uses the path relative to the vault root.
+    ///
+    /// # Arguments
+    /// @param path: &PathBuf
+    /// @return Option<&crate::file::File>
     pub fn get_file(&self, path: &PathBuf) -> Option<&crate::file::File> {
         self.files.get(path)
     }
-    
-	/// Get a mutable file from the Vault. Uses the path relative to the vault root.
-	/// 
-	/// # Arguments
-	/// @param path: &PathBuf
-	/// @return Option<&mut crate::file::File>
-	pub fn get_file_mut(&mut self, path: &PathBuf) -> Option<&mut crate::file::File> {
+
+    /// Get a mutable file from the Vault. Uses the path relative to the vault root.
+    ///
+    /// # Arguments
+    /// @param path: &PathBuf
+    /// @return Option<&mut crate::file::File>
+    pub fn get_file_mut(&mut self, path: &PathBuf) -> Option<&mut crate::file::File> {
         self.files.get_mut(path)
     }
 
-	/// Get all files in the Vault.
-	/// 
-	/// # Arguments
-	/// @return &HashMap<PathBuf, crate::file::File>
+    /// Get all files in the Vault.
+    ///
+    /// # Arguments
+    /// @return &HashMap<PathBuf, crate::file::File>
     pub fn get_files(&self) -> &HashMap<PathBuf, crate::file::File> {
         &self.files
     }
 
-	/// Adds an AIDriver to the Vault.
-	/// 
-	/// # Arguments
-	/// @param aidriver: crate::ai::api::AIDriver
+    /// Adds an AIDriver to the Vault.
+    ///
+    /// # Arguments
+    /// @param aidriver: crate::ai::api::AIDriver
     pub fn add_ai_driver(&mut self, aidriver: crate::ai::api::AIDriver) {
         self.aidriver = Some(aidriver);
     }
-    
-	/// Updates the embeddings of all files in the Vault.
-	/// 
-	/// # Arguments
-	/// @return Result<()>
-	pub async fn update_embeddings(&mut self) -> Result<()> {
+
+    /// Updates the embeddings of all files in the Vault.
+    ///
+    /// # Arguments
+    /// @return Result<()>
+    pub async fn update_embeddings(&mut self) -> Result<()> {
         if self.aidriver.is_none() {
             return Err(Error::NoAIDriver);
         }
@@ -235,7 +238,9 @@ impl Vault {
         let mut mdfiles: Vec<(&mut MDFile, &Path)> = Vec::new();
 
         for (path, file) in self.files.iter_mut() {
-            let last_modified = std::fs::metadata(&file.path)?
+            let abs_file_path = self.vault_root.join(path);
+            println!("Updating embedding for file: {}", abs_file_path.display());
+            let last_modified = std::fs::metadata(&abs_file_path)?
                 .modified()?
                 .elapsed()?
                 .as_millis();
@@ -259,9 +264,11 @@ impl Vault {
 
         let mut futures = Vec::new();
         for (mdfile, path) in mdfiles {
-            futures.push(
-                mdfile.update_embedding(self.aidriver.as_ref().expect("AIDriver not found"), path),
-            );
+            let abs_file_path = self.vault_root.join(path);
+            futures.push(mdfile.update_embedding(
+                self.aidriver.as_ref().expect("AIDriver not found"),
+                abs_file_path,
+            ));
         }
 
         let results = futures::future::join_all(futures).await;
@@ -276,11 +283,11 @@ impl Vault {
     }
 
     /// Get the closest files to a given file by embedding distance.
-	/// 
-	/// # Arguments
-	/// @param path: &PathBuf
-	/// @param n: usize
-	/// @return Result<Vec<(PathBuf, f64)>>
+    ///
+    /// # Arguments
+    /// @param path: &PathBuf
+    /// @param n: usize
+    /// @return Result<Vec<(PathBuf, f64)>>
     pub fn get_closest_files(&self, path: &PathBuf, n: usize) -> Result<Vec<(PathBuf, f64)>> {
         let file = self
             .files
@@ -330,12 +337,12 @@ impl Vault {
         Ok(distances)
     }
 
-	/// Get the closest files to a given file by embedding distance with a threshold.
-	/// 
-	/// # Arguments
-	/// @param path: &PathBuf
-	/// @param threshold: f64
-	/// @return Result<Vec<(PathBuf, f64)>>
+    /// Get the closest files to a given file by embedding distance with a threshold.
+    ///
+    /// # Arguments
+    /// @param path: &PathBuf
+    /// @param threshold: f64
+    /// @return Result<Vec<(PathBuf, f64)>>
     pub fn get_closest_files_by_threshold(
         &self,
         path: &PathBuf,

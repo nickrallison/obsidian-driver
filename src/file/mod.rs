@@ -103,6 +103,7 @@ impl File {
     ///
     fn read_file(path: PathBuf) -> Result<Self> {
         let path_clone = path.clone();
+
         let ext = path_clone
             .extension()
             .ok_or(Error::Generic(f!(

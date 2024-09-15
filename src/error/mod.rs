@@ -48,4 +48,7 @@ pub enum Error {
     
 	#[error(transparent)]
 	OpenAIValidationError(#[from] crate::ai::api::openai::OpenAIValidationError),
+
+    #[error(transparent)]
+    WalkDirError(#[from] walkdir::Error),
 }

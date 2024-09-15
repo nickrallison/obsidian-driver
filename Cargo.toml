@@ -13,5 +13,6 @@ serde_yaml = "0.9.34"
 regex = "1.10.6"
 futures = "0.3.30"
 kdtree = "0.7.0"
+walkdir = "2.5.0"
 
 
