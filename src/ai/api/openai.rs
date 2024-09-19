@@ -131,8 +131,14 @@ impl OpenAIDriver {
     ///
     /// @super
     pub(super) async fn chat_smart(&self, prompt: crate::ai::prompt::Prompt) -> Result<String> {
-        let tokens = prompt.max_characters / self.config.characters_per_token;
-        if tokens > self.config.smart_model_max_tokens {
+        let mut tokens = 0;
+        if let Some(max_chars) = prompt.max_characters {
+            tokens = max_chars / self.config.characters_per_token;
+        } else {
+            tokens = self.config.smart_model_max_output_tokens;
+        }
+
+        if tokens > self.config.smart_model_max_input_tokens {
             return Err(Error::PromptExceedsModelTokenLimit(prompt));
         }
         let request_body = serde_json::json!({
@@ -158,8 +164,13 @@ impl OpenAIDriver {
             .json(&request_body)
             .send()
             .await?;
-
         let response_text = response.text().await?;
+        let response_json: serde_json::Value = serde_json::from_str(&response_text)?;
+        let response_message = response_json["choices"][0]["message"]["content"]
+            .as_str()
+            .ok_or(Error::InvalidChatResponse(response_text))?;
+
+        let response_text = response_message.to_string();
         Ok(response_text)
     }
 
@@ -171,8 +182,13 @@ impl OpenAIDriver {
     ///
     /// @super
     pub(super) async fn chat_cheap(&self, prompt: crate::ai::prompt::Prompt) -> Result<String> {
-        let tokens = prompt.max_characters / self.config.characters_per_token;
-        if tokens > self.config.cheap_model_max_tokens {
+        let mut tokens = 0;
+        if let Some(max_chars) = prompt.max_characters {
+            tokens = max_chars / self.config.characters_per_token;
+        } else {
+            tokens = self.config.cheap_model_max_output_tokens;
+        }
+        if tokens > self.config.cheap_model_max_input_tokens {
             return Err(Error::PromptExceedsModelTokenLimit(prompt));
         }
         let request_body = serde_json::json!({
@@ -245,8 +261,10 @@ pub struct OpenAIConfig {
     pub smart_text_model: String,
     pub cheap_text_model: String,
 
-    pub smart_model_max_tokens: u32,
-    pub cheap_model_max_tokens: u32,
+    pub smart_model_max_input_tokens: u32,
+    pub smart_model_max_output_tokens: u32,
+    pub cheap_model_max_input_tokens: u32,
+    pub cheap_model_max_output_tokens: u32,
 
     // Urls
     pub embedding_url: String,
@@ -271,7 +289,7 @@ impl OpenAIConfig {
         validator.validate().await
     }
 
-    /// Create an OpenAIConfig from a file.
+    ///  sCreate an OpenAIConfig from a file.
     ///
     /// # Arguments
     /// @param `config_path`: `PathBuf` - The path to the configuration file.

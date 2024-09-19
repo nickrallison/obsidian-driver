@@ -58,7 +58,7 @@ use crate::prelude::*;
 pub struct Prompt {
 	pub system_prompt: String,
 	pub user_prompt: String,
-	pub max_characters: u32,
+	pub max_characters: Option<u32>,
 }
 
 impl Prompt {
@@ -76,7 +76,7 @@ impl Prompt {
 	///
 	/// let prompt = Prompt::new("You are a helpful assistant", "This is a sample prompt", 100);
 	/// ```
-	pub fn new(system_prompt: &str, user_prompt: &str, max_characters: u32) -> Prompt {
+	pub fn new(system_prompt: &str, user_prompt: &str, max_characters: Option<u32>) -> Prompt {
 		Prompt {
 			system_prompt: system_prompt.to_string(),
 			user_prompt: user_prompt.to_string(),
@@ -119,7 +119,7 @@ impl Prompt {
 		let mut system_prompt = self.system_prompt.clone();
 		let mut user_prompt = self.user_prompt.clone();
 		let mut matches: Vec<String> = Vec::new();
-		let pattern = regex::Regex::new(r"\$\w+\$").unwrap();
+		let pattern = regex::Regex::new(r"\[\w+\]").unwrap();
 		for cap in pattern.captures_iter(&system_prompt) {
 			matches.push(cap[0].to_string());
 		}
@@ -127,7 +127,7 @@ impl Prompt {
 			matches.push(cap[0].to_string());
 		}
 		for m in matches {
-			let key = m.trim_matches('$');
+			let key = m.trim_start_matches('[').trim_end_matches(']');
 			match context.get(key) {
 				Some(value) => {
 					system_prompt = system_prompt.replace(&m, value);
@@ -227,7 +227,7 @@ impl From<HashMap<String, String>> for Context {
 
 impl Display for Prompt {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "#### System Prompt ####\n{}\n\n#### User Prompt####\n{}\n\n#### Max Characters ####\n{}", self.system_prompt, self.user_prompt, self.max_characters)
+		write!(f, "#### System Prompt ####\n{}\n\n#### User Prompt####\n{}\n\n#### Max Characters ####\n{:?}", self.system_prompt, self.user_prompt, self.max_characters)
 	}
 }
 
@@ -237,25 +237,25 @@ mod prompt_tests {
 
 	#[test]
 	fn test_prompt_new() {
-		let prompt = Prompt::new("You are a helpful assistant", "This is a sample prompt", 100);
+		let prompt = Prompt::new("You are a helpful assistant", "This is a sample prompt", Some(100));
 		assert_eq!(prompt.system_prompt, "You are a helpful assistant");
 		assert_eq!(prompt.user_prompt, "This is a sample prompt");
-		assert_eq!(prompt.max_characters, 100);
+		assert_eq!(prompt.max_characters, Some(100));
 	}
 
 	#[test]
 	fn test_prompt_substitube_valid() {
-		let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
+		let prompt = Prompt::new("You are a helpful assistant named [name]", "This is a sample prompt", Some(100));
 		let mut context = Context::default();
 		context.insert("name", "Bob");
-		let expected = Prompt::new("You are a helpful assistant named Bob", "This is a sample prompt", 100);
+		let expected = Prompt::new("You are a helpful assistant named Bob", "This is a sample prompt", Some(100));
 		let actual = prompt.substitute(&context).unwrap();
 		assert_eq!(actual, expected);
 	}
 
 	#[test]
 	fn test_prompt_substitube_invalid() {
-		let prompt = Prompt::new("You are a helpful assistant named $name$", "This is a sample prompt", 100);
+		let prompt = Prompt::new("You are a helpful assistant named [name]", "This is a sample prompt", Some(100));
 		let context = Context::default();
 		let actual = prompt.substitute(&context);
 		assert!(actual.is_err());

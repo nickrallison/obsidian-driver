@@ -30,6 +30,9 @@ pub enum Error {
     #[error("No AI Driver Provided")]
     NoAIDriver,
 
+    #[error("Invalid Chat Response:\n{0}")]
+    InvalidChatResponse(String),
+
     // Transparent Errors
     #[error(transparent)]
     IO(#[from] std::io::Error),

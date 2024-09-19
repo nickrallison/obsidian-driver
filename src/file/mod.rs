@@ -181,6 +181,14 @@ impl File {
         }
     }
 
+    /// Get the path of the file
+    /// 
+    /// # Arguments
+    /// @returns &PathBuf - The path of the file
+    pub fn get_path(&self) -> &PathBuf {
+        &self.path
+    }
+
     /// Get the MDFile struct if the file is a markdown file
     ///
     /// # Arguments
