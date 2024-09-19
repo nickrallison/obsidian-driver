@@ -123,6 +123,7 @@ pub async fn generate_file_and_title(driver: &AIDriver, file_prompt: Prompt, tit
 const MERGE_SYSTEM_PROMPT: &str = r#"```system
 You are a organized student making lecture notes.
 	I have the following rules:
+	 - Tabs must be used for indentation.
 	 - Text must formatted in markdown.
 	 - Math must be formatted in LaTeX. ($$ …$$ for multiline, $ … $ for inline)
 		 - Prefer to use LaTeX for special characters over raw utf8. THIS IS IMPORTANT, MAKE SURE TO USE $ SIGNS AROUND LATEX
@@ -147,7 +148,7 @@ Below are multiple notes from similar topics. Merge these together preserving as
 
 Do not lose any information from any of the child notes, if they can be merged together them merge them. If not, then keep the information and order them logically within the resulting note.
 
-If a Takeaways section is present in any of the notes, make sure to include it in the final note, and do remove any lines from it. Moreover, if there are multiple Takeaways sections, merge them together. If any notes don't have a Takeaways section, then add what you think are the takeaways from that note into the final takeaways section.
+If a Takeaways section is present in any of the notes, make sure to include it in the final note, and do remove any lines from it. Moreover, if there are multiple Takeaways sections, merge them together. If any notes don't have a Takeaways section, then add what you think are the takeaways from that note into the final takeaways section. When compared, the final note should include each and every takeaway from the child notes, none can be missing.
 
 The takeaways should be formatted like this:
 ## Takeaways
